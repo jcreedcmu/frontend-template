@@ -19,7 +19,8 @@ export function App(props: AppProps): JSX.Element {
     Counter Value is: {counter}<p />
     <button onMouseDown={(e) => { dispatch({ t: 'increment' }) }}>Increment</button><p />
     <button onMouseDown={(e) => { dispatch({ t: 'side-effect' }) }}>Side Effect</button><p />
-    <ExampleCanvas counter={counter} />
+    <ExampleCanvas counter={counter} dispatch={dispatch} /><p />
+    {state.debugStr}
   </>;
 }
 

@@ -1,8 +1,11 @@
 import *  as React from 'react';
 import { CanvasInfo, useCanvas } from './lib/use-canvas';
+import { Dispatch } from './action';
+import { relpos, rrelpos } from './lib/dutil';
 
 export type ExampleCanvasProps = {
   counter: number,
+  dispatch: Dispatch,
 }
 
 export type ExampleCanvasState = {
@@ -38,6 +41,10 @@ function onLoad(ci: CanvasInfo): void {
 }
 
 export function ExampleCanvas(props: ExampleCanvasProps): JSX.Element {
+  const { dispatch } = props;
   const [cref, mc] = useCanvas(props, render, [props], onLoad);
-  return <canvas style={{ width: 200, height: 200 }} ref={cref} />;
+  function onMouseDown(e: React.MouseEvent): void {
+    dispatch({ t: 'mouseDown', p_in_canvas: rrelpos(e) });
+  }
+  return <canvas onMouseDown={onMouseDown} style={{ width: 200, height: 200 }} ref={cref} />;
 }

@@ -14,5 +14,11 @@ export function reduce(state: AppState, action: Action): AppState {
         s.effects.push({ t: 'alert' });
       });
     }
+    case 'mouseDown': {
+      const { x, y } = action.p_in_canvas;
+      return produce(state, s => {
+        s.debugStr = `clicked at (${x}, ${y})`;
+      });
+    }
   }
 }
