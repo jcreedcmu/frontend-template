@@ -10,7 +10,10 @@ build:
 	node build.mjs
 
 count:
-	wc -l src/*.ts{x,}
+	wc -l src/*.ts src/*.tsx src/lib/*.ts
 
 check:
 	npx tsc -w
+
+test:
+	npm test

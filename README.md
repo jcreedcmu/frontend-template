@@ -24,5 +24,5 @@ Other make targets are:
 make watch # build js whenever ts source changes
 make build # build once
 make check # typecheck js whenever ts source changes
-# TODO: make test
+make test  # run tests
 ```
