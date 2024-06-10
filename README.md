@@ -7,7 +7,7 @@ a few of my favorite libraries for frontend development.
 Building
 --------
 
-Assuming you have nodejs and python3 installed,
+Assuming you have nodejs installed,
 
 ```shell
 $ make

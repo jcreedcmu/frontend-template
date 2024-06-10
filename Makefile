@@ -1,13 +1,13 @@
 serve:
 	[ -d "./node_modules" ] || npm install
-	node build.js
-	cd public && python3 -m http.server 8000 -b 127.0.0.1
+	node build.mjs
+	npx ts-node server/server.ts
 
 watch:
-	node ./build.js watch
+	node ./build.mjs watch
 
 build:
-	node build.js
+	node build.mjs
 
 count:
 	wc -l src/*.ts{x,}
