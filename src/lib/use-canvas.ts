@@ -40,8 +40,8 @@ export function useRawCanvas<S, CI>(
       if (canvas !== null) {
         const width = Math.floor(canvas.getBoundingClientRect().width);
         const height = Math.floor(canvas.getBoundingClientRect().height);
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width * devicePixelRatio;
+        canvas.height = height * devicePixelRatio;
         const rawInfo = { c: canvas, size: { x: width, y: height } };
         infoRef.current = onLoad(rawInfo);
       }
@@ -59,7 +59,14 @@ export function useCanvas<S>(
     React.RefCallback<HTMLCanvasElement>,
     React.MutableRefObject<CanvasInfo | undefined>,
   ] {
-  return useRawCanvas<S, CanvasInfo>(state, render, deps, rci => {
+  function dprRender(ci: CanvasInfo, state: S): void {
+    const { d } = ci;
+    d.save();
+    d.scale(devicePixelRatio, devicePixelRatio);
+    render(ci, state);
+    d.restore();
+  }
+  return useRawCanvas<S, CanvasInfo>(state, dprRender, deps, rci => {
     const ci = { ...rci, d: rci.c.getContext('2d')! };
     onLoad(ci);
     return ci;
