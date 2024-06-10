@@ -12,7 +12,7 @@ app.post('/export', (req, res) => {
   });
   req.on('end', () => {
     const body = JSON.parse(data);
-    writeFileSync(__dirname + 'data.json', JSON.stringify(body, null, 2) + '\n', 'utf8');
+    writeFileSync(path.join(__dirname, '../data.json'), JSON.stringify(body, null, 2) + '\n', 'utf8');
     console.log('Wrote data to data.json');
     res.end('ok');
   });
