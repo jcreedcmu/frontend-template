@@ -1,11 +1,11 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { doEffect } from './effect';
+import { ExampleCanvas } from './example-canvas';
 import { extractEffects } from './lib/extract-effects';
 import { useEffectfulReducer } from './lib/use-effectful-reducer';
 import { reduce } from './reduce';
 import { mkState } from './state';
-import { ExampleCanvas } from './example-canvas';
 
 export type AppProps = {
   color: string,
@@ -28,5 +28,6 @@ export function init() {
   const props: AppProps = {
     color: '#f0f',
   };
-  ReactDOM.render(<App {...props} />, document.querySelector('.app') as any);
+  const root = createRoot(document.querySelector('.app')!);
+  root.render(<App {...props} />);
 }
