@@ -15,5 +15,8 @@ export function reduce(state: AppState, action: Action): AppState {
         s.effects.push({ t: 'alert' });
       });
     }
+    case 'setAppState': {
+      return action.state;
+    }
   }
 }
