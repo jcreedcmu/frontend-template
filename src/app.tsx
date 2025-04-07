@@ -27,10 +27,23 @@ function statusMessage(message: string): JSX.Element {
 function InitServer(props: { dispatch: Dispatch, state: AppState & { t: 'initializing' } }): JSX.Element {
   const { state, dispatch } = props;
   const { id } = state;
+
   React.useEffect(() => {
     const options = { debug: 3 };
     const peer = new Peer(id, options);
-    dispatch({ t: 'setAppState', state: { t: 'server_waiting_for_client', effects: [], id, peer } });
+    peer.on('open', () => {
+      console.log(`open! server peer id = ${peer.id}`);
+      peer.on('connection', conn => {
+        console.log('got a connection!', conn);
+        dispatch({ t: 'serverGetConn', conn });
+      });
+      peer.on('close', () => { console.log('server close') });
+      peer.on('disconnected', () => { console.log('server disconnected') });
+      peer.on('error', err => {
+        console.log('err!', err);
+      });
+      dispatch({ t: 'setAppState', state: { t: 'server_waiting_for_client', effects: [], id, peer } });
+    });
   });
   return statusMessage('Initializing...');
 }
@@ -40,11 +53,41 @@ function InitClient(props: { dispatch: Dispatch, state: AppState & { t: 'initial
   const { id } = state;
   React.useEffect(() => {
     const options = { debug: 3 };
-    const peer = new Peer(id);
-    peer.connect(serverId);
-    dispatch({ t: 'setAppState', state: { t: 'client', effects: [], id, serverId, game: {}, peer } });
+    console.log(`client id ${id}`);
+    console.log(`client connecting to ${serverId}`);
+    const peer = new Peer(id, options);
+    peer.on('open', () => {
+      console.log('client peer open');
+      const conn = peer.connect(serverId);
+      conn.on('open', () => {
+        console.log('client connection open');
+        conn.send('hello');
+        dispatch({ t: 'setAppState', state: { t: 'client', effects: [], id, serverId, game: {}, peer } });
+      });
+    });
   });
   return statusMessage('Connecting...');
+}
+
+function ServerWaiting(props: { dispatch: Dispatch, state: AppState & { t: 'server_waiting_for_client' } }): JSX.Element {
+  const { state, dispatch } = props;
+  const { id, peer } = state;
+  React.useEffect(() => {
+    peer.on('connection', conn => {
+      console.log('connection-b!', conn);
+    });
+  });
+  const url = new URL(document.URL);
+  console.log(`server id ${id}`);
+  url.searchParams.set('connect', id);
+  return <>
+    <div className='outerDiv'>
+      <div className='innerDiv'>
+        Waiting for other players. Send them this invite link: <br /><br />
+        <a href={url.toString()}>Join the game</a>
+      </div>
+    </div>
+  </>;
 }
 
 export function App(props: AppProps): JSX.Element {
@@ -64,18 +107,7 @@ export function App(props: AppProps): JSX.Element {
     }
     case 'server': return statusMessage('Server ready');
     case 'client': return statusMessage('Client connected');
-    case 'server_waiting_for_client': {
-      const url = new URL(document.URL);
-      url.searchParams.set('connect', id);
-      return <>
-        <div className='outerDiv'>
-          <div className='innerDiv'>
-            Waiting for other players. Send them this invite link: <br /><br />
-            <a href={url.toString()}>Join the game</a>
-          </div>
-        </div>
-      </>;
-    }
+    case 'server_waiting_for_client': return <ServerWaiting dispatch={dispatch} state={state} />;
   }
 
 

@@ -18,5 +18,19 @@ export function reduce(state: AppState, action: Action): AppState {
     case 'setAppState': {
       return action.state;
     }
+    case 'serverGetConn': {
+      if (state.t != 'server_waiting_for_client') {
+        console.error(`invariant violation: action serverGetConn`);
+        return state;
+      }
+      return {
+        t: 'server',
+        id: state.id,
+        effects: [],
+        game: {},
+        peer: state.peer,
+      }
+    }
+
   }
 }
