@@ -13,14 +13,17 @@ export type AppProps = {
 
 export function App(props: AppProps): JSX.Element {
   const [state, dispatch] = useEffectfulReducer(mkState(), extractEffects(reduce), doEffect);
-  const { counter } = state;
+  const { id } = state;
   return <>
-    <span style={{ color: props.color }}>Hello, World!</span><p />
-    Counter Value is: {counter}<p />
-    <button onMouseDown={(e) => { dispatch({ t: 'increment' }) }}>Increment</button><p />
-    <button onMouseDown={(e) => { dispatch({ t: 'side-effect' }) }}>Side Effect</button><p />
-    <ExampleCanvas counter={counter} dispatch={dispatch} /><p />
-    {state.debugStr}
+
+    <div className='outerDiv'>
+      <div className='innerDiv'>
+        <button onMouseDown={(e) => { }}>Host</button><br />
+        <div className='sep' />
+        <br />
+        <button onMouseDown={(e) => { }}>Connect</button>
+      </div>
+    </div>
   </>;
 }
 
