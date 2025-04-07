@@ -1,5 +1,5 @@
 import { Effect } from "./effect";
-import { Peer } from "peerjs";
+import { DataConnection, Peer } from "peerjs";
 
 export type GameState = {
 
@@ -17,8 +17,8 @@ export type AppState =
     effects: Effect[],
     id: string,
   }
-  | { t: 'server', id: string, peer: Peer, game: GameState, effects: Effect[] }
-  | { t: 'client', id: string, serverId: string, peer: Peer, game: GameState, effects: Effect[] }
+  | { t: 'server', id: string, peer: Peer, conn: DataConnection, game: GameState, effects: Effect[] }
+  | { t: 'client', id: string, serverId: string, peer: Peer, conn: DataConnection, game: GameState, effects: Effect[] }
   ;
 
 export function mkState(): AppState {

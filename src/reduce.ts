@@ -28,6 +28,7 @@ export function reduce(state: AppState, action: Action): AppState {
         id: state.id,
         effects: [],
         game: {},
+        conn: action.conn,
         peer: state.peer,
       }
     }

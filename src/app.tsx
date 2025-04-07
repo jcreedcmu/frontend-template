@@ -35,6 +35,13 @@ function InitServer(props: { dispatch: Dispatch, state: AppState & { t: 'initial
       console.log(`open! server peer id = ${peer.id}`);
       peer.on('connection', conn => {
         console.log('got a connection!', conn);
+        // XXX DX
+        (window as any)['debug'] = (message: string) => {
+          conn.send(message);
+        };
+        conn.on('data', data => {
+          console.log('server got message', data);
+        });
         dispatch({ t: 'serverGetConn', conn });
       });
       peer.on('close', () => { console.log('server close') });
@@ -61,8 +68,16 @@ function InitClient(props: { dispatch: Dispatch, state: AppState & { t: 'initial
       const conn = peer.connect(serverId);
       conn.on('open', () => {
         console.log('client connection open');
-        conn.send('hello');
-        dispatch({ t: 'setAppState', state: { t: 'client', effects: [], id, serverId, game: {}, peer } });
+
+
+        (window as any)['debug'] = (message: string) => {
+          conn.send(message);
+        };
+        conn.on('data', data => {
+          console.log('client got message', data);
+        });
+
+        dispatch({ t: 'setAppState', state: { t: 'client', effects: [], id, serverId, game: {}, peer, conn } });
       });
     });
   });
@@ -72,11 +87,6 @@ function InitClient(props: { dispatch: Dispatch, state: AppState & { t: 'initial
 function ServerWaiting(props: { dispatch: Dispatch, state: AppState & { t: 'server_waiting_for_client' } }): JSX.Element {
   const { state, dispatch } = props;
   const { id, peer } = state;
-  React.useEffect(() => {
-    peer.on('connection', conn => {
-      console.log('connection-b!', conn);
-    });
-  });
   const url = new URL(document.URL);
   console.log(`server id ${id}`);
   url.searchParams.set('connect', id);
