@@ -14,17 +14,40 @@ export type AppProps = {
 export function App(props: AppProps): JSX.Element {
   const [state, dispatch] = useEffectfulReducer(mkState(), extractEffects(reduce), doEffect);
   const { id } = state;
-  return <>
-
-    <div className='outerDiv'>
-      <div className='innerDiv'>
-        <button onMouseDown={(e) => { }}>Host</button><br />
-        <div className='sep' />
-        <br />
-        <button onMouseDown={(e) => { }}>Connect</button>
+  function status(message: string): JSX.Element {
+    console.log(message);
+    return <>
+      <div className='outerDiv'>
+        <div className='innerDiv'>
+          {message}
+        </div>
       </div>
-    </div>
-  </>;
+    </>
+  }
+  switch (state.t) {
+    case 'pending_server': return status('Starting game...');
+    case 'pending_client': return status('Connecting...');
+    case 'server': return status('Server');
+    case 'client': return status('Client');
+    case 'server_waiting_for_client': {
+      const url = new URL(document.URL);
+      url.searchParams.set('connect', id);
+      return <>
+        <div className='outerDiv'>
+          <div className='innerDiv'>
+            Waiting for other players. Send them this invite link: <br /><br />
+            <a href={url.toString()}>Join the game</a>
+          </div>
+        </div>
+      </>;
+    }
+  }
+
+
+  /* <button onMouseDown={(e) => { }}>Host</button><br />
+     <div className='sep' />
+     <br />
+     <button onMouseDown={(e) => { }}>Connect</button> */
 }
 
 export function init() {
