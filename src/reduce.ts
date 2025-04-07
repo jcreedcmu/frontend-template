@@ -10,9 +10,9 @@ export function reduce(state: AppState, action: Action): AppState {
     case 'mouseDown': {
       return state;
     }
-    case 'side-effect': {
+    case 'effect': {
       return produce(state, s => {
-        s.effects.push({ t: 'alert' });
+        s.effects.push(action.effect);
       });
     }
     case 'setAppState': {
@@ -30,8 +30,17 @@ export function reduce(state: AppState, action: Action): AppState {
         game: {},
         conn: action.conn,
         peer: state.peer,
+        log: [],
       }
     }
-
+    case 'rxMessage': {
+      if (!(state.t == 'server' || state.t == 'client')) {
+        console.error(`invariant violation: action rxMessage`);
+        return state;
+      }
+      return produce(state, s => {
+        s.log.push(JSON.stringify(action.message))
+      });
+    }
   }
 }

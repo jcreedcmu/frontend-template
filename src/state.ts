@@ -17,8 +17,25 @@ export type AppState =
     effects: Effect[],
     id: string,
   }
-  | { t: 'server', id: string, peer: Peer, conn: DataConnection, game: GameState, effects: Effect[] }
-  | { t: 'client', id: string, serverId: string, peer: Peer, conn: DataConnection, game: GameState, effects: Effect[] }
+  | {
+    t: 'server',
+    id: string,
+    peer: Peer,
+    conn: DataConnection,
+    game: GameState,
+    effects: Effect[],
+    log: string[],
+  }
+  | {
+    t: 'client',
+    id: string,
+    serverId: string,
+    peer: Peer,
+    conn: DataConnection,
+    game: GameState,
+    effects: Effect[],
+    log: string[],
+  }
   ;
 
 export function mkState(): AppState {

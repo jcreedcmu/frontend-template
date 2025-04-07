@@ -13,12 +13,12 @@ export type AppProps = {
   color: string,
 };
 
-function statusMessage(message: string): JSX.Element {
+function statusMessage(message: string, more?: JSX.Element): JSX.Element {
   console.log(message);
   return <>
     <div className='outerDiv'>
       <div className='innerDiv'>
-        {message}
+        {message}{more}
       </div>
     </div>
   </>
@@ -35,12 +35,10 @@ function InitServer(props: { dispatch: Dispatch, state: AppState & { t: 'initial
       console.log(`open! server peer id = ${peer.id}`);
       peer.on('connection', conn => {
         console.log('got a connection!', conn);
-        // XXX DX
-        (window as any)['debug'] = (message: string) => {
-          conn.send(message);
-        };
+
         conn.on('data', data => {
           console.log('server got message', data);
+          dispatch({ t: 'rxMessage', message: data });
         });
         dispatch({ t: 'serverGetConn', conn });
       });
@@ -68,16 +66,11 @@ function InitClient(props: { dispatch: Dispatch, state: AppState & { t: 'initial
       const conn = peer.connect(serverId);
       conn.on('open', () => {
         console.log('client connection open');
-
-
-        (window as any)['debug'] = (message: string) => {
-          conn.send(message);
-        };
         conn.on('data', data => {
           console.log('client got message', data);
+          dispatch({ t: 'rxMessage', message: data });
         });
-
-        dispatch({ t: 'setAppState', state: { t: 'client', effects: [], id, serverId, game: {}, peer, conn } });
+        dispatch({ t: 'setAppState', state: { t: 'client', effects: [], id, serverId, game: {}, peer, conn, log: [] } });
       });
     });
   });
@@ -100,6 +93,15 @@ function ServerWaiting(props: { dispatch: Dispatch, state: AppState & { t: 'serv
   </>;
 }
 
+function SendButton(props: { dispatch: Dispatch }): JSX.Element {
+  function onClick() {
+    props.dispatch({ t: 'effect', effect: { t: 'send', message: 'ping' } });
+  }
+  return <button onClick={onClick}>
+    Ping
+  </button>;
+}
+
 export function App(props: AppProps): JSX.Element {
   const [state, dispatch] = useEffectfulReducer(mkState(), extractEffects(reduce), doEffect);
   const { id } = state;
@@ -115,8 +117,8 @@ export function App(props: AppProps): JSX.Element {
         return <InitServer dispatch={dispatch} state={state} />;
       }
     }
-    case 'server': return statusMessage('Server ready');
-    case 'client': return statusMessage('Client connected');
+    case 'server': return statusMessage('Server ready', <><br /><SendButton dispatch={dispatch} /><pre>{state.log.join('\n')}</pre></>);
+    case 'client': return statusMessage('Client ready', <><br /><SendButton dispatch={dispatch} /><pre>{state.log.join('\n')}</pre></>);
     case 'server_waiting_for_client': return <ServerWaiting dispatch={dispatch} state={state} />;
   }
 
